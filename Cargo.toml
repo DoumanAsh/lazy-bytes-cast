@@ -1,0 +1,7 @@
+[package]
+name = "lazy-bytes-cast"
+version = "0.1.0"
+authors = ["Douman <douman@gmx.se>"]
+description = "Lazy casts from & to byte arrays"
+
+[dependencies]
