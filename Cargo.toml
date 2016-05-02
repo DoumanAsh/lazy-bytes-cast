@@ -3,5 +3,8 @@ name = "lazy-bytes-cast"
 version = "0.1.0"
 authors = ["Douman <douman@gmx.se>"]
 description = "Lazy casts from & to byte arrays"
+repository = "https://github.com/DoumanAsh/lazy-bytes-cast"
+documentation = "http://doumanash.github.io/lazy-bytes-cast/doc/lazy_bytes_cast/index.html"
+license = "MIT"
 
 [dependencies]
