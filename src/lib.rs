@@ -1,11 +1,11 @@
 /*!
 This crate provides simple methods to cast from and into byte arrays.
 
-# Note:
+# Note
 
 The crates will not take care of byte order for you. Cuz lazy.
 
-# Usage example:
+# Usage example
 
 ```rust
 extern crate lazy_bytes_cast;

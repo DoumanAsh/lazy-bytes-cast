@@ -1,13 +1,15 @@
 lazy-bytes-cast
 ==============
 
+[![Build status](https://ci.appveyor.com/api/projects/status/github/DoumanAsh/lazy-bytes-cast?branch=master&svg=true)](https://ci.appveyor.com/project/DoumanAsh/lazy-bytes-cast)
+
 This crate provides simple methods to cast from and into byte arrays.
 
-# Note:
+# Note
 
 The crates will not take care of byte order for you. Cuz lazy.
 
-# Usage example:
+# Usage example
 
 ```rust
 extern crate lazy_bytes_cast;
