@@ -33,7 +33,7 @@ fn tester_bytes_cast(bytes_to_parse: &[u8], expect: u32) {
 }
 
 #[test]
-fn test_bytes_from() {
+fn test_bytes_from_common() {
     let run_data = vec![
         ([50, 0, 0, 0], 50),
         ([127, 150, 152, 0], 9999999),
@@ -44,4 +44,35 @@ fn test_bytes_from() {
     for &(bytes_to_parse, expected) in run_data.iter() {
         tester_bytes_cast(&bytes_to_parse, expected);
     }
+}
+
+#[test]
+fn test_bytes_from_vec() {
+    let vec_data = vec![127, 150, 152, 0];
+    let expected: u32 = 9999999;
+
+    let result: Result<u32, String> = vec_data.cast_to();
+    assert!(result.is_ok());
+    assert!(result.unwrap() == expected);
+}
+
+#[test]
+fn test_bytes_from_slice() {
+    let slice = [127u8, 150, 152, 0];
+    let expected: u32 = 9999999;
+
+    let result: Result<u32, String> = slice[..].cast_to();
+    assert!(result.is_ok());
+    assert!(result.unwrap() == expected);
+}
+
+#[test]
+fn test_bytes_from_slice_ref() {
+    let slice = [127u8, 150, 152, 0];
+    let slice = &slice[..];
+    let expected: u32 = 9999999;
+
+    let result: Result<u32, String> = slice.cast_to();
+    assert!(result.is_ok());
+    assert!(result.unwrap() == expected);
 }

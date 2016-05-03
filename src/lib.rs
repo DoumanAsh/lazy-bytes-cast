@@ -131,6 +131,13 @@ pub unsafe trait FromBytesCast<T: ToBytesCast> {
     fn cast_to(&self) -> Result<T, String>;
 }
 
+unsafe impl<T: ToBytesCast> FromBytesCast<T> for Vec<u8> {
+    #[inline]
+    fn cast_to(&self) -> Result<T, String> {
+        bytes_cast(self)
+    }
+}
+
 unsafe impl<T: ToBytesCast> FromBytesCast<T> for [u8] {
     #[inline]
     fn cast_to(&self) -> Result<T, String> {
@@ -141,6 +148,6 @@ unsafe impl<T: ToBytesCast> FromBytesCast<T> for [u8] {
 unsafe impl<'a, T: ToBytesCast> FromBytesCast<T> for &'a[u8] {
     #[inline]
     fn cast_to(&self) -> Result<T, String> {
-        bytes_cast(self)
+        bytes_cast(*self)
     }
 }
