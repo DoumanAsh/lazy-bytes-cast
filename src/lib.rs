@@ -119,11 +119,11 @@ pub fn bytes_cast<T: ToBytesCast>(bytes: &[u8]) -> Result<T, String> {
         return Err("Bytes size is insufficient for a cast".to_string());
     }
 
-    let mut result: T = unsafe {std::mem::uninitialized()};
     unsafe {
+        let mut result: T = std::mem::uninitialized();
         std::ptr::copy_nonoverlapping(bytes.as_ptr(), &mut result as *mut _ as *mut u8, len);
+        Ok(result)
     }
-    Ok(result)
 }
 
 ///Trait to provide casting function to byte slices
