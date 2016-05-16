@@ -2,8 +2,6 @@ language: rust
 
 matrix:
   include:
-    - env: TARGET=NATIVE_STABLE
-      rust: stable
     - env: TARGET=NATIVE_BETA
       rust: beta
     # Note: apt packages are the C cross compiler and the cross compiled C library
@@ -42,7 +40,6 @@ install:
   - if [[ $TARGET != NATIVE* ]]; then export PATH="$PATH:$HOME/.cargo/bin" && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=beta && rustup target add $TARGET; fi
   - rustc -V
   - cargo -V
-
 
 script:
   - if [[ $TARGET != NATIVE* ]]; then cargo build --target $TARGET; fi
