@@ -1,0 +1,55 @@
+language: rust
+
+matrix:
+  fast_finish: true
+
+matrix:
+  include:
+    # Note: apt packages are the C cross compiler and the cross compiled C library
+    - env: TARGET=arm-unknown-linux-gnueabi
+      addons:
+        apt:
+          packages:
+            - gcc-arm-linux-gnueabi
+            - libc6-armel-cross
+            - libc6-dev-armel-cross
+    - env: TARGET=arm-unknown-linux-gnueabihf
+      addons:
+        apt:
+          packages: &armhf
+            - gcc-arm-linux-gnueabihf
+            - libc6-armhf-cross
+            - libc6-dev-armhf-cross
+    - env: TARGET=armv7-unknown-linux-gnueabihf
+      addons:
+        apt:
+          packages: *armhf
+    - env: TARGET=i686-unknown-linux-musl
+      addons:
+        apt:
+          packages: &i686
+            - gcc-multilib
+    - env: TARGET=i686-unknown-linux-gnu
+      addons:
+        apt:
+          packages: *i686
+    - env: TARGET=x86_64-unknown-linux-musl
+    - env: TARGET=x86_64-pc-windows-gnu
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - gcc-mingw-w64
+
+install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
+  - curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=beta
+  - rustc -V
+  - cargo -V
+  - rustup target add $TARGET
+
+
+build:
+  - cargo build --target $TARGET
+  - cargo test --target $TARGET
