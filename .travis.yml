@@ -2,8 +2,12 @@ language: rust
 
 matrix:
   include:
+    # All NATIVE targets will use normal build
+    - env: TARGET=NATIVE_STABLE
+      rust: stable
     - env: TARGET=NATIVE_BETA
       rust: beta
+    # NON-NATIVE targets will be used in builds via --target
     # Note: apt packages are the C cross compiler and the cross compiled C library
     - env: TARGET=arm-unknown-linux-gnueabi
       addons:
@@ -37,7 +41,7 @@ matrix:
             - gcc-mingw-w64
 
 install:
-  - if [[ $TARGET != NATIVE* ]]; then export PATH="$PATH:$HOME/.cargo/bin" && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=beta && rustup target add $TARGET; fi
+  - if [[ $TARGET != NATIVE* ]]; then export PATH="$HOME/.cargo/bin:$PATH" && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=beta && rustup target add $TARGET; fi
   - rustc -V
   - cargo -V
 
