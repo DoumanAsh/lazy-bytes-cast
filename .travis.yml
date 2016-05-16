@@ -1,7 +1,4 @@
-language: rust
-
-matrix:
-  fast_finish: true
+language: generic
 
 matrix:
   include:
@@ -24,11 +21,6 @@ matrix:
       addons:
         apt:
           packages: *armhf
-    - env: TARGET=i686-unknown-linux-musl
-      addons:
-        apt:
-          packages: &i686
-            - gcc-multilib
     - env: TARGET=i686-unknown-linux-gnu
       addons:
         apt:
@@ -50,6 +42,6 @@ install:
   - rustup target add $TARGET
 
 
-build:
+script:
   - cargo build --target $TARGET
   - cargo test --target $TARGET
