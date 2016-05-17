@@ -56,7 +56,7 @@ pub fn to_bytes<T: std::marker::Copy>(data: T) -> Vec<u8> {
 ///Trait to provide ```to_bytes``` method for a arbitrary data.
 ///
 ///This trait is implemented for a basic integer that can be safely converted.
-pub unsafe trait ToBytesCast {
+pub unsafe trait ToBytesCast : std::marker::Copy {
     fn to_bytes(&self) -> Vec<u8>;
 }
 
@@ -120,9 +120,7 @@ pub fn bytes_cast<T: ToBytesCast>(bytes: &[u8]) -> Result<T, String> {
     }
 
     unsafe {
-        let mut result: T = std::mem::uninitialized();
-        std::ptr::copy_nonoverlapping(bytes.as_ptr(), &mut result as *mut _ as *mut u8, len);
-        Ok(result)
+        Ok(bytes_cast_lazy(bytes))
     }
 }
 

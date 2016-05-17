@@ -47,6 +47,14 @@ fn test_bytes_from_common() {
 }
 
 #[test]
+fn test_bytes_from_fail() {
+    let vec_data = vec![127, 150, 152, 0];
+    let result: Result<u64, String> = vec_data.cast_to();
+
+    assert!(result.is_err());
+}
+
+#[test]
 fn test_bytes_from_vec() {
     let vec_data = vec![127, 150, 152, 0];
     let expected: u32 = 9999999;
