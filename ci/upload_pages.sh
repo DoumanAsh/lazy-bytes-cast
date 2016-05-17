@@ -63,7 +63,8 @@ function upload_pages() {
     cd ..
 
     # Clean out existing contents
-    rm -rf out/doc || return 0
+    rm -rf out/*
+    generate_index_redirect >> out/index.html
 
     # Build docs
     cargo doc --no-deps
