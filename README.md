@@ -1,7 +1,6 @@
 lazy-bytes-cast
 ==============
 
-[![Build status](https://ci.appveyor.com/api/projects/status/github/DoumanAsh/lazy-bytes-cast?branch=master&svg=true)](https://ci.appveyor.com/project/DoumanAsh/lazy-bytes-cast)
 [![Build Status](https://travis-ci.org/DoumanAsh/lazy-bytes-cast.svg?branch=master)](https://travis-ci.org/DoumanAsh/lazy-bytes-cast)
 
 This crate provides simple methods to cast from and into byte arrays.
