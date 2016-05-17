@@ -2,6 +2,8 @@ language: rust
 
 env:
   global:
+      #Define CARGO_API(upload crate) && GIT_TOKEN(upload pages and releases)
+
       # Define to true to upload if cargo search will not find crate
     - CARGO_UPLOAD_FIRST_TIME=false
       # Define default branch for docs
@@ -37,6 +39,7 @@ matrix:
         apt:
           packages: *armhf
     - env: TARGET=i686-unknown-linux-gnu
+    - env: TARGET=i686-pc-windows-gnu
       addons:
         apt:
           packages: *i686
@@ -72,8 +75,10 @@ after_script:
       if [ $exitCode -eq 0 ]; then
         # Success
 
-        bash ci/upload_rust_crate.sh
-        bash ci/upload_pages.sh
+        curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_pages.sh > ~/upload_pages.sh
+        curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_rust_crate.sh > ~/upload_rust_crate.sh
+        bash ~/upload_rust_crate.sh
+        bash ~/upload_pages.sh
 
       elif [ $exitCode -eq 1 ]; then
         echo "Something goes wrong. Skip auto-update"
