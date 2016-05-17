@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["bytes_cast","Converts slice of bytes to an integer."],["bytes_cast_lazy","Unsafe version of ```bytes_cast```"],["to_bytes","Converts data to a byte array."]],"trait":[["FromBytesCast","Trait to provide casting function to byte slices"],["ToBytesCast","Trait to provide ```to_bytes``` method for a arbitrary data."]]});

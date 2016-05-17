@@ -26,7 +26,7 @@ function generate_index_redirect() {
 function travis_configure_repo_oauth() {
     git config user.name "Travis CI"
     git config user.email "$COMMIT_AUTHOR_EMAIL"
-    echo "https://${GIT_TOKEN}:x-oauth-basic@github.com\n" > ~\.git-credentials
+    echo "https://${GIT_TOKEN}:x-oauth-basic@github.com\n" > ~/.git-credentials
     git config remote.origin.url "https://${GIT_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git"
 }
 
@@ -58,13 +58,12 @@ function upload_pages() {
     # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
     git clone $REPO out
     cd out
-    # Creates branch if none exists
     git checkout $BRANCH_NAME || git checkout --orphan $BRANCH_NAME
-    cd ..
+    cd ../
 
     # Clean out existing contents
-    rm -rf out/*
-    generate_index_redirect >> out/index.html
+    rm -rf out/doc
+    generate_index_redirect > out/index.html
 
     # Build docs
     cargo doc --no-deps
@@ -86,4 +85,4 @@ function upload_pages() {
     rm -rf out/
 }
 
-export -f upload_pages
+upload_pages

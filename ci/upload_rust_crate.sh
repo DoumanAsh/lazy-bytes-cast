@@ -40,4 +40,4 @@ function upload_rust_crate() {
     cd -
 }
 
-export -f upload_rust_crate
+upload_rust_crate

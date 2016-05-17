@@ -72,11 +72,8 @@ after_script:
       if [ $exitCode -eq 0 ]; then
         # Success
 
-        source ci/upload_rust_crate.sh
-        source ci/upload_pages.sh
-
-        upload_rust_crate
-        upload_pages
+        bash ci/upload_rust_crate.sh
+        bash ci/upload_pages.sh
 
       elif [ $exitCode -eq 1 ]; then
         echo "Something goes wrong. Skip auto-update"
