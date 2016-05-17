@@ -23,6 +23,3 @@ build: false
 
 test_script:
   - cargo test
-
-on_success:
-  - powershell -version 3 -File build.ps1 bot

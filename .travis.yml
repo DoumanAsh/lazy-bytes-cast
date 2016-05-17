@@ -48,3 +48,90 @@ install:
 script:
   - if [[ $TARGET != NATIVE* ]]; then cargo build --target $TARGET; fi
   - if [[ $TARGET = NATIVE* ]]; then cargo build && cargo test; fi
+
+after_script:
+  - |
+
+
+      if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+        echo "Skip pull request"
+        exit 0
+      fi
+
+      declare exitCode
+      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
+      exitCode=$?
+
+
+      if [ $exitCode -eq 0 ]; then
+        # Success
+        function upload_pages {
+            if [ -z ${GIT_TOKEN+x} ]; then
+                echo "GIT_TOKEN is not set. Skip github pages update"
+                return 0
+            fi
+
+            # Save some useful information
+            REPO=`git config remote.origin.url`
+            SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+            SHA=`git rev-parse --verify HEAD`
+
+            # Clone the existing gh-pages for this repo into out/
+            # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
+            git clone $REPO out
+            cd out
+            # Exit if no gh-pages
+            git checkout $TARGET_BRANCH || return 0
+            cd ..
+
+            # Clean out existing contents
+            rm -rf out/doc || return 0
+
+            # Build docs
+            cargo doc --no-debs
+            cp -rf target\doc\ out\
+
+            cd out
+            # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
+            if [ -z `git diff --exit-code` ]; then
+                echo "No changes to the docs"
+                return 0
+            fi
+            git config user.name "Travis CI"
+            git config user.email "$COMMIT_AUTHOR_EMAIL"
+            git add .
+            git commit -m "Auto-update Commit: ${SHA}"
+            echo "https://${!GIT_TOKEN}:x-oauth-basic@github.com\n" > ~\.git-credentials
+            git config remote.origin.url "https://${!GIT_TOKEN}@github.com/${!TRAVIS_REPO_SLUG}.git"
+            git push origin HEAD
+        }
+
+        # Set CARGO_API to update crate and its docs
+        if [ -z  ${CARGO_API+x} ]; then
+            echo "CARGO_API is not set. Skip update of crate"
+        else
+            # Check crate version
+            CRATE_VER=`cargo search lazy-bytes-cast | grep -oP "[0-9]\.[0-9]\.[0-9]"`
+            pwd
+            cd ${TRAVIS_BUILD_DIR}
+            pwd
+            CURRENT_VER=`grep -oP "[0-9]\.[0-9]\.[0-9]" Cargo.toml`
+            echo "Crate current version=${CRATE_VER}"
+            echo "Repo current version=${CURRENT_VER}"
+            # Check if crate update is needed
+            if [ "$CRATE_VER" != "" ]; then
+                ## each separate version number must be less than 3 digit wide !
+                function version { echo "$@" | gawk -F. '{ printf("%03d%03d%03d\n", $1,$2,$3); }'; }
+                if [ "$(version "$CURRENT_VER")" -gt "$(version "$CRATE_VER")" ]; then
+                    cargo publish
+                    upload_pages
+                fi
+            fi
+        fi
+
+
+
+      elif [ $exitCode -eq 1 ]; then
+        echo "Something goes wrong. Skip auto-update"
+        # fail
+      fi
