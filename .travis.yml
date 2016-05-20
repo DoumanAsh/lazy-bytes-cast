@@ -9,7 +9,7 @@ env:
       # Define default branch for docs
     - PAGES_BRANCH_NAME=gh-pages
       # Sets to true in case  of crate's version bump
-    - UPDATE_PAGES=false
+    - UPDATE_PAGES=true
 
 matrix:
   include:

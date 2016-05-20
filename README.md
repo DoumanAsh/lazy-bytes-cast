@@ -16,7 +16,7 @@ extern crate lazy_bytes_cast;
 
 use lazy_bytes_cast::{
     ToBytesCast,
-    FromBytesCast
+    FromBytesCastLazy
 };
 
 fn main() {
@@ -24,7 +24,8 @@ fn main() {
     println!("result={:?}", int_to.to_bytes());
 
     let bytes: [u8; 4] = [255, 255, 255, 255];
-    let result: u32 = bytes.cast_to().unwrap();
-    println!("result={}",result);
+    let result: u32 = bytes.cast_to();
+    println!("result={}", result);
 }
 ```
+
