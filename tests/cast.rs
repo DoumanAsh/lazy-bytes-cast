@@ -84,3 +84,14 @@ fn test_bytes_from_slice_ref() {
     assert!(result.is_ok());
     assert!(result.unwrap() == expected);
 }
+
+#[test]
+fn test_bytes_from_array() {
+    let arr: [u8; 4] = [127, 150, 152, 0];
+    let expected: u32 = 9999999;
+
+
+    let result: Result<u32, String> = arr.cast_to();
+    assert!(result.is_ok());
+    assert_eq!(result.unwrap(), expected);
+}
