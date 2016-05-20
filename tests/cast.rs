@@ -2,7 +2,8 @@ extern crate lazy_bytes_cast;
 
 use lazy_bytes_cast::{
     ToBytesCast,
-    FromBytesCast
+    FromBytesCast,
+    FromBytesCastLazy
 };
 
 fn tester_bytes_to<T: ToBytesCast>(int_to_parse: T, expect: &[u8]) {
@@ -90,8 +91,39 @@ fn test_bytes_from_array() {
     let arr: [u8; 4] = [127, 150, 152, 0];
     let expected: u32 = 9999999;
 
+    let result: u32 = arr.cast_to();
+    assert_eq!(result, expected);
 
-    let result: Result<u32, String> = arr.cast_to();
-    assert!(result.is_ok());
-    assert_eq!(result.unwrap(), expected);
+    let arr = [1u8, 1];
+    let expected: u16 = 257;
+
+    let result: u16 = arr.cast_to();
+    assert_eq!(result, expected);
+
+    let arr = [1u8, 1, 1, 1, 1, 1, 2 , 1];
+    let expected: u64 = 72621647814787329;
+
+    let result: u64 = arr.cast_to();
+    assert_eq!(result, expected);
+}
+
+#[test]
+fn test_bytes_from_tuple() {
+    let tuple = (127u8, 150, 152, 0);
+    let expected: u32 = 9999999;
+
+    let result: u32 = tuple.cast_to();
+    assert_eq!(result, expected);
+
+    let tuple = (1u8, 1);
+    let expected: u16 = 257;
+
+    let result: u16 = tuple.cast_to();
+    assert_eq!(result, expected);
+
+    let tuple = (1u8, 1, 1, 1, 1, 1, 2, 1);
+    let expected: u64 = 72621647814787329;
+
+    let result: u64 = tuple.cast_to();
+    assert_eq!(result, expected);
 }
