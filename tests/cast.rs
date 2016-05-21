@@ -27,7 +27,7 @@ fn tests_bytes_to() {
 }
 
 fn tester_bytes_cast(bytes_to_parse: &[u8], expect: u32) {
-    let result: Result<u32, String> = bytes_to_parse.cast_to();
+    let result: Result<u32, ()> = bytes_to_parse.cast_to();
 
     assert!(result.is_ok());
     assert!(result.unwrap() == expect);
@@ -50,7 +50,7 @@ fn test_bytes_from_common() {
 #[test]
 fn test_bytes_from_fail() {
     let vec_data = vec![127, 150, 152, 0];
-    let result: Result<u64, String> = vec_data.cast_to();
+    let result: Result<u64, ()> = vec_data.cast_to();
 
     assert!(result.is_err());
 }
@@ -60,7 +60,7 @@ fn test_bytes_from_vec() {
     let vec_data = vec![127, 150, 152, 0];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, String> = vec_data.cast_to();
+    let result: Result<u32, ()> = vec_data.cast_to();
     assert!(result.is_ok());
     assert!(result.unwrap() == expected);
 }
@@ -70,7 +70,7 @@ fn test_bytes_from_slice() {
     let slice = [127u8, 150, 152, 0];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, String> = slice[..].cast_to();
+    let result: Result<u32, ()> = slice[..].cast_to();
     assert!(result.is_ok());
     assert!(result.unwrap() == expected);
 }
@@ -81,7 +81,7 @@ fn test_bytes_from_slice_ref() {
     let slice = &slice[..];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, String> = slice.cast_to();
+    let result: Result<u32, ()> = slice.cast_to();
     assert!(result.is_ok());
     assert!(result.unwrap() == expected);
 }
@@ -126,4 +126,21 @@ fn test_bytes_from_tuple() {
 
     let result: u64 = tuple.cast_to();
     assert_eq!(result, expected);
+}
+
+#[test]
+fn test_copy_to_bytes() {
+    let mut arr = [0u8; 8];
+    let var_from = 9999999;
+
+    assert!(var_from.copy_to_bytes(&mut arr[1..]).is_ok());
+    assert_eq!(arr, [0, 127, 150, 152, 0, 0, 0, 0])
+}
+
+#[test]
+fn test_copy_to_bytes_err() {
+    let mut arr = [0u8; 3];
+    let var_from = 9999999;
+
+    assert!(var_from.copy_to_bytes(&mut arr[1..]).is_err());
 }
