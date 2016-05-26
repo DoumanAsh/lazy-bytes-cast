@@ -9,7 +9,7 @@ env:
       # Define default branch for docs
     - PAGES_BRANCH_NAME=gh-pages
       # Sets to true in case  of crate's version bump
-    - UPDATE_PAGES=true
+    - UPDATE_PAGES=false
 
 matrix:
   include:
@@ -77,7 +77,7 @@ after_script:
 
         curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_pages.sh > ~/upload_pages.sh
         curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_rust_crate.sh > ~/upload_rust_crate.sh
-        bash ~/upload_rust_crate.sh
+        source ~/upload_rust_crate.sh
         bash ~/upload_pages.sh
 
       elif [ $exitCode -eq 1 ]; then
