@@ -67,6 +67,7 @@ pub fn copy_to_bytes<T: marker::Copy>(data: T, to: &mut [u8]) -> Result<(), ()> 
 pub unsafe trait ToBytesCast : marker::Copy {
     fn to_bytes(&self) -> Vec<u8>;
     fn copy_to_bytes(&self, to: &mut [u8]) -> Result<(), ()>;
+    fn get_byte(&self, index: usize) -> Option<u8>;
 }
 
 macro_rules! impl_to_traits
@@ -82,6 +83,16 @@ macro_rules! impl_to_traits
                 #[inline]
                 fn copy_to_bytes(&self, to: &mut [u8]) -> Result<(), ()> {
                     copy_to_bytes(*self, to)
+                }
+
+                fn get_byte(&self, index: usize) -> Option<u8> {
+                    let integer = *self as u64;
+
+                    if index >= mem::size_of::<$t>(){
+                        return None;
+                    }
+
+                    Some( (integer >> (index * 8) & 0xff) as u8 )
                 }
             }
         )+

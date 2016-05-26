@@ -3,7 +3,8 @@ extern crate lazy_bytes_cast;
 use lazy_bytes_cast::{
     ToBytesCast,
     FromBytesCast,
-    FromBytesCastLazy
+    FromBytesCastLazy,
+    ByteIndex
 };
 
 fn tester_bytes_to<T: ToBytesCast>(int_to_parse: T, expect: &[u8]) {
@@ -143,4 +144,28 @@ fn test_copy_to_bytes_err() {
     let var_from = 9999999;
 
     assert!(var_from.copy_to_bytes(&mut arr[1..]).is_err());
+}
+
+#[test]
+fn test_byte_index() {
+    let val_u32: u32 = 9999999;
+
+    let result = val_u32.byte(0);
+    assert!(result.is_some());
+    assert_eq!(result.unwrap(), 127);
+
+    let result = val_u32.byte(1);
+    assert!(result.is_some());
+    assert_eq!(result.unwrap(), 150);
+
+    let result = val_u32.byte(2);
+    assert!(result.is_some());
+    assert_eq!(result.unwrap(), 152);
+
+    let result = val_u32.byte(3);
+    assert!(result.is_some());
+    assert_eq!(result.unwrap(), 0);
+
+    let result = val_u32.byte(4);
+    assert!(result.is_none());
 }

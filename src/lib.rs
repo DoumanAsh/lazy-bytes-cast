@@ -28,6 +28,7 @@ fn main() {
 */
 mod to_bytes;
 mod from_bytes;
+mod byte_index;
 
 pub use to_bytes::{
     to_bytes,
@@ -40,4 +41,8 @@ pub use from_bytes::{
     bytes_cast,
     FromBytesCastLazy,
     FromBytesCast
+};
+
+pub use byte_index::{
+    ByteIndex
 };
