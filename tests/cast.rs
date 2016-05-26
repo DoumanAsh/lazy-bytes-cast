@@ -4,6 +4,7 @@ use lazy_bytes_cast::{
     ToBytesCast,
     FromBytesCast,
     FromBytesCastLazy,
+    ByteSlice,
     ByteIndex
 };
 
@@ -168,4 +169,12 @@ fn test_byte_index() {
 
     let result = val_u32.byte(4);
     assert!(result.is_none());
+}
+
+#[test]
+fn test_byte_slice() {
+    let expected = [127u8, 150, 152, 0];
+    let var_from: u32 = 9999999;
+
+    assert_eq!(var_from.byte_slice(), expected);
 }

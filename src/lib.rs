@@ -44,5 +44,6 @@ pub use from_bytes::{
 };
 
 pub use byte_index::{
+    ByteSlice,
     ByteIndex
 };
