@@ -178,3 +178,23 @@ fn test_byte_slice() {
 
     assert_eq!(var_from.byte_slice(), expected);
 }
+
+#[test]
+fn test_byte_mut_slice() {
+    let expected = [127u8, 150, 152, 0];
+    let mut var_from: u32 = 9999999;
+
+    assert_eq!(var_from.byte_mut_slice(), expected);
+
+    var_from.byte_mut_slice()[0] = 1;
+    assert_eq!(var_from, 9999873);
+
+    var_from.byte_mut_slice()[1] = 1;
+    assert_eq!(var_from, 9961729);
+
+    var_from.byte_mut_slice()[2] = 1;
+    assert_eq!(var_from, 65793);
+
+    var_from.byte_mut_slice()[3] = 1;
+    assert_eq!(var_from, 16843009);
+}
