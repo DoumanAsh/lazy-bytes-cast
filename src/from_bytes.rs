@@ -118,6 +118,12 @@ impl_from_traits_arr!(
     [u16; 2], [i16; 2]
 );
 
+#[cfg(target_pointer_with = "32")]
+impl_from_traits_arr!([usize; 4], [isize; 4]);
+
+#[cfg(target_pointer_with = "64")]
+impl_from_traits_arr!([usize; 8], [isize; 8]);
+
 macro_rules! impl_from_traits_tuple4
 {
     ($($t:ty),+) => {
@@ -161,3 +167,9 @@ macro_rules! impl_from_traits_tuple2
 impl_from_traits_tuple2!(i16, u16);
 impl_from_traits_tuple4!(i32, u32, f32);
 impl_from_traits_tuple8!(i64, u64, f64);
+
+#[cfg(target_pointer_with = "64")]
+impl_from_traits_tuple8!(isize, usize);
+
+#[cfg(target_pointer_with = "32")]
+impl_from_traits_tuple4!(isize, usize);
