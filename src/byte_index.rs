@@ -144,8 +144,8 @@ impl_index_trait2!(i16, u16);
 impl_index_trait4!(i32, u32, f32);
 impl_index_trait8!(i64, u64, f64);
 
-#[cfg(target_pointer_with = "64")]
+#[cfg(target_pointer_width = "64")]
 impl_index_trait8!(isize, usize);
 
-#[cfg(target_pointer_with = "32")]
+#[cfg(target_pointer_width = "32")]
 impl_index_trait4!(isize, usize);
