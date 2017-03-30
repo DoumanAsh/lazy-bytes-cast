@@ -45,7 +45,7 @@ fn main() {
     let bytes = vec![127, 150, 152, 0];
 
     if let Some(int) = bytes_cast::<u32>(&bytes) {
-        println!("bytes={:?}", bytes);
+        println!("bytes={}", int);
     }
     else {
         println!("Couldn't extract integer from bytes");
