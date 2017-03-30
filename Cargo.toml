@@ -1,10 +1,14 @@
 [package]
 name = "lazy-bytes-cast"
-version = "0.5.1"
+version = "1.0.0"
 authors = ["Douman <douman@gmx.se>"]
 description = "Lazy casts from & to byte arrays"
 repository = "https://github.com/DoumanAsh/lazy-bytes-cast"
-documentation = "http://doumanash.github.io/lazy-bytes-cast/doc/lazy_bytes_cast/index.html"
+documentation = "https://docs.rs/crate/lazy-bytes-cast/"
 license = "MIT"
 
 [dependencies]
+
+[features]
+default = ["std"]
+std = []

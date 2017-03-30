@@ -1,86 +1,13 @@
 language: rust
+rust:
+  - beta
 
-env:
-  global:
-      #Define CARGO_API(upload crate) && GIT_TOKEN(upload pages and releases)
+os:
+  - linux
+  - osx
 
-      # Define to true to upload if cargo search will not find crate
-    - CARGO_UPLOAD_FIRST_TIME=false
-      # Define default branch for docs
-    - PAGES_BRANCH_NAME=gh-pages
-      # Sets to true in case  of crate's version bump
-    - UPDATE_PAGES=false
-
-matrix:
-  include:
-    # All NATIVE targets will use normal build
-    - env: TARGET=NATIVE_STABLE
-      rust: stable
-    - env: TARGET=NATIVE_BETA
-      rust: beta
-    # NON-NATIVE targets will be used in builds via --target
-    # Note: apt packages are the C cross compiler and the cross compiled C library
-    - env: TARGET=arm-unknown-linux-gnueabi
-      addons:
-        apt:
-          packages:
-            - gcc-arm-linux-gnueabi
-            - libc6-armel-cross
-            - libc6-dev-armel-cross
-    - env: TARGET=arm-unknown-linux-gnueabihf
-      addons:
-        apt:
-          packages: &armhf
-            - gcc-arm-linux-gnueabihf
-            - libc6-armhf-cross
-            - libc6-dev-armhf-cross
-    - env: TARGET=armv7-unknown-linux-gnueabihf
-      addons:
-        apt:
-          packages: *armhf
-    - env: TARGET=i686-unknown-linux-gnu
-    - env: TARGET=i686-pc-windows-gnu
-      addons:
-        apt:
-          packages: *i686
-    - env: TARGET=x86_64-unknown-linux-musl
-    - env: TARGET=x86_64-pc-windows-gnu
-      dist: trusty
-      sudo: required
-      addons:
-        apt:
-          packages:
-            - gcc-mingw-w64
-
-install:
-  - if [[ $TARGET != NATIVE* ]]; then export PATH="$HOME/.cargo/bin:$PATH" && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=beta && rustup target add $TARGET; fi
-  - rustc -V
-  - cargo -V
+sudo: false
 
 script:
-  - if [[ $TARGET != NATIVE* ]]; then cargo build --target $TARGET; fi
-  - if [[ $TARGET = NATIVE* ]]; then cargo build && cargo test; fi
-
-after_script:
-  - |
-      if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-        echo "Skip deploy on pull request"
-        exit 0
-      fi
-
-      declare exitCode
-      curl -sSL https://raw.githubusercontent.com/alrra/travis-after-all/1.4.4/lib/travis-after-all.js | node
-      exitCode=$?
-
-      if [ $exitCode -eq 0 ]; then
-        # Success
-
-        curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_pages.sh > ~/upload_pages.sh
-        curl -sSL https://raw.githubusercontent.com/DoumanAsh/douman-ci/master/rust/upload_rust_crate.sh > ~/upload_rust_crate.sh
-        source ~/upload_rust_crate.sh
-        bash ~/upload_pages.sh
-
-      elif [ $exitCode -eq 1 ]; then
-        echo "Something goes wrong. Skip auto-update"
-        # fail
-      fi
+  - cargo build
+  - cargo test

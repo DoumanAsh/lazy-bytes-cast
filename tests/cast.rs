@@ -1,9 +1,13 @@
 extern crate lazy_bytes_cast;
 
-use lazy_bytes_cast::{
-    ToBytesCast,
+use lazy_bytes_cast::*;
+
+use to::ToBytesCast;
+use from::{
     FromBytesCast,
-    FromBytesCastLazy,
+    FromBytesCastLazy
+};
+use slice::{
     ByteSlice,
     ByteIndex
 };
@@ -29,9 +33,9 @@ fn tests_bytes_to() {
 }
 
 fn tester_bytes_cast(bytes_to_parse: &[u8], expect: u32) {
-    let result: Result<u32, ()> = bytes_to_parse.cast_to();
+    let result: Option<u32> = bytes_to_parse.cast_to();
 
-    assert!(result.is_ok());
+    assert!(result.is_some());
     assert!(result.unwrap() == expect);
 }
 
@@ -52,9 +56,9 @@ fn test_bytes_from_common() {
 #[test]
 fn test_bytes_from_fail() {
     let vec_data = vec![127, 150, 152, 0];
-    let result: Result<u64, ()> = vec_data.cast_to();
+    let result: Option<u64> = vec_data.cast_to();
 
-    assert!(result.is_err());
+    assert!(result.is_none());
 }
 
 #[test]
@@ -62,8 +66,8 @@ fn test_bytes_from_vec() {
     let vec_data = vec![127, 150, 152, 0];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, ()> = vec_data.cast_to();
-    assert!(result.is_ok());
+    let result: Option<u32> = vec_data.cast_to();
+    assert!(result.is_some());
     assert!(result.unwrap() == expected);
 }
 
@@ -72,8 +76,8 @@ fn test_bytes_from_slice() {
     let slice = [127u8, 150, 152, 0];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, ()> = slice[..].cast_to();
-    assert!(result.is_ok());
+    let result: Option<u32> = slice[..].cast_to();
+    assert!(result.is_some());
     assert!(result.unwrap() == expected);
 }
 
@@ -83,8 +87,8 @@ fn test_bytes_from_slice_ref() {
     let slice = &slice[..];
     let expected: u32 = 9999999;
 
-    let result: Result<u32, ()> = slice.cast_to();
-    assert!(result.is_ok());
+    let result: Option<u32> = slice.cast_to();
+    assert!(result.is_some());
     assert!(result.unwrap() == expected);
 }
 
