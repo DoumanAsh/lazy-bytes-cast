@@ -11,6 +11,7 @@ use slice::{
     ByteSlice,
     ByteIndex
 };
+use array::IntoByteArray;
 
 fn tester_bytes_to<T: ToBytesCast>(int_to_parse: T, expect: &[u8]) {
     let result = int_to_parse.to_bytes();
@@ -182,6 +183,15 @@ fn test_byte_slice() {
 
     assert_eq!(var_from.byte_slice(), expected);
 }
+
+#[test]
+fn test_into_byte_array() {
+    let expected = [127u8, 150, 152, 0];
+    let var_from: u32 = 9999999;
+
+    assert_eq!(var_from.into_byte_array(), expected);
+}
+
 
 #[test]
 fn test_byte_mut_slice() {

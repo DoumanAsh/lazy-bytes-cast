@@ -22,17 +22,28 @@
 //!```
 
 use ::mem;
+use ::std_slice;
 
 /// Slice Accessor.
-pub trait ByteSlice {
+///
+/// Note that one must be careful when impl this trait for own types.
+pub unsafe trait ByteSlice: Sized {
     /// Returns read-only slice over integer bytes
-    fn byte_slice(&self) -> &[u8];
+    fn byte_slice<'a>(&'a self) -> &'a [u8] {
+        unsafe {
+            std_slice::from_raw_parts(self as *const _ as *const _, mem::size_of::<Self>())
+        }
+    }
     /// Returns mutable slice over integer bytes
-    fn byte_mut_slice(&mut self) -> &mut [u8];
+    fn byte_mut_slice<'a>(&'a mut self) -> &'a mut [u8] {
+        unsafe {
+            std_slice::from_raw_parts_mut(self as *mut _ as *mut _, mem::size_of::<Self>())
+        }
+    }
 }
 
 /// Indexing Accessor.
-pub trait ByteIndex : ByteSlice {
+pub unsafe trait ByteIndex : ByteSlice {
     /// Returns byte from integer by index.
     ///
     ///# Parameters:
@@ -43,130 +54,22 @@ pub trait ByteIndex : ByteSlice {
     ///
     ///* `Some` - Contains byte.
     ///* `None` - Index out of bounds.
-    fn byte(&self, idx: usize) -> Option<u8>;
+    fn byte(&self, idx: usize) -> Option<u8> {
+        if idx >= mem::size_of::<Self>() {
+            return None;
+        }
+
+        Some(self.byte_slice()[idx])
+    }
 }
 
-macro_rules! impl_index_trait1
-{
-    ($($t:ty), +) => {
+macro_rules! impl_trait {
+    ($($type:ty,)+) => {
         $(
-            impl ByteSlice for $t {
-                fn byte_slice(&self) -> &[u8] {
-                    let bytes: &[u8; 1] = unsafe { mem::transmute(self) };
-                    &bytes[..]
-                }
-
-                fn byte_mut_slice(&mut self) -> &mut [u8] {
-                    let bytes: &mut [u8; 1] = unsafe { mem::transmute(self) };
-                    &mut bytes[..]
-                }
-            }
-
-            impl ByteIndex for $t {
-                fn byte(&self, idx: usize) -> Option<u8> {
-                    if idx >= mem::size_of::<$t>() {
-                        return None;
-                    }
-
-                    Some(self.byte_slice()[idx])
-                }
-            }
+            unsafe impl ByteSlice for $type {}
+            unsafe impl ByteIndex for $type {}
         )+
-    };
+    }
 }
 
-macro_rules! impl_index_trait2
-{
-    ($($t:ty), +) => {
-        $(
-            impl ByteSlice for $t {
-                fn byte_slice(&self) -> &[u8] {
-                    let bytes: &[u8; 2] = unsafe { mem::transmute(self) };
-                    &bytes[..]
-                }
-
-                fn byte_mut_slice(&mut self) -> &mut [u8] {
-                    let bytes: &mut [u8; 2] = unsafe { mem::transmute(self) };
-                    &mut bytes[..]
-                }
-            }
-
-            impl ByteIndex for $t {
-                fn byte(&self, idx: usize) -> Option<u8> {
-                    if idx >= mem::size_of::<$t>() {
-                        return None;
-                    }
-
-                    Some(self.byte_slice()[idx])
-                }
-            }
-        )+
-    };
-}
-
-macro_rules! impl_index_trait4
-{
-    ($($t:ty), +) => {
-        $(
-            impl ByteSlice for $t {
-                fn byte_slice(&self) -> &[u8] {
-                    let bytes: &[u8; 4] = unsafe { mem::transmute(self) };
-                    &bytes[..]
-                }
-
-                fn byte_mut_slice(&mut self) -> &mut [u8] {
-                    let bytes: &mut [u8; 4] = unsafe { mem::transmute(self) };
-                    &mut bytes[..]
-                }
-            }
-            impl ByteIndex for $t {
-                fn byte(&self, idx: usize) -> Option<u8> {
-                    if idx >= mem::size_of::<$t>() {
-                        return None;
-                    }
-
-                    Some(self.byte_slice()[idx])
-                }
-            }
-        )+
-    };
-}
-
-macro_rules! impl_index_trait8
-{
-    ($($t:ty), +) => {
-        $(
-            impl ByteSlice for $t {
-                fn byte_slice(&self) -> &[u8] {
-                    let bytes: &[u8; 8] = unsafe { mem::transmute(self) };
-                    &bytes[..]
-                }
-
-                fn byte_mut_slice(&mut self) -> &mut [u8] {
-                    let bytes: &mut [u8; 8] = unsafe { mem::transmute(self) };
-                    &mut bytes[..]
-                }
-            }
-            impl ByteIndex for $t {
-                fn byte(&self, idx: usize) -> Option<u8> {
-                    if idx >= mem::size_of::<$t>(){
-                        return None;
-                    }
-
-                    Some(self.byte_slice()[idx])
-                }
-            }
-        )+
-    };
-}
-
-impl_index_trait1!(i8, u8);
-impl_index_trait2!(i16, u16);
-impl_index_trait4!(i32, u32, f32);
-impl_index_trait8!(i64, u64, f64);
-
-#[cfg(target_pointer_width = "64")]
-impl_index_trait8!(isize, usize);
-
-#[cfg(target_pointer_width = "32")]
-impl_index_trait4!(isize, usize);
+impl_trait!(u8, i8, u16, i16, u32, i32, f32, u64, i64, f64, usize, isize,);

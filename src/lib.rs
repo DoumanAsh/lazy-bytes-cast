@@ -15,9 +15,11 @@ extern crate core;
 use core::{
     mem,
     marker,
-    ptr
+    ptr,
+    slice as std_slice
 };
 
 pub mod to;
 pub mod from;
 pub mod slice;
+pub mod array;
