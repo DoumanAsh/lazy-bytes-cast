@@ -1,6 +1,6 @@
 [package]
 name = "lazy-bytes-cast"
-version = "2.0.0"
+version = "2.1.0"
 authors = ["Douman <douman@gmx.se>"]
 description = "Lazy casts from & to byte arrays"
 repository = "https://github.com/DoumanAsh/lazy-bytes-cast"
