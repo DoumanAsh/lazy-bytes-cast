@@ -17,11 +17,7 @@
 //!}
 //!```
 
-use ::{
-    marker,
-    mem,
-    ptr
-};
+use core::{marker, mem, ptr};
 
 #[cfg(feature = "std")]
 ///Converts data to a byte array.

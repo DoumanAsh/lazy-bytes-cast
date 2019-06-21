@@ -3,7 +3,6 @@
 //!# Usage
 //!
 //!```rust
-//!extern crate lazy_bytes_cast;
 //!use lazy_bytes_cast::array::IntoByteArray;
 //!
 //!fn main() {
@@ -13,7 +12,7 @@
 //!}
 //!```
 
-use ::mem;
+use core::mem;
 
 ///Describes conversion to byte array.
 pub trait IntoByteArray: Copy {

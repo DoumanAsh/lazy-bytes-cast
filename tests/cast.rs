@@ -13,12 +13,14 @@ use slice::{
 };
 use array::IntoByteArray;
 
+#[cfg(feature = "std")]
 fn tester_bytes_to<T: ToBytesCast>(int_to_parse: T, expect: &[u8]) {
     let result = int_to_parse.to_bytes();
 
     assert!(result == expect);
 }
 
+#[cfg(feature = "std")]
 #[test]
 fn tests_bytes_to() {
     let run_data = vec![

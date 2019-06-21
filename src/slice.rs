@@ -5,7 +5,6 @@
 //!# Usage
 //!
 //!```rust
-//!extern crate lazy_bytes_cast;
 //!use lazy_bytes_cast::slice::{
 //!   ByteSlice,
 //!   ByteIndex
@@ -21,8 +20,8 @@
 //!}
 //!```
 
-use ::mem;
-use ::std_slice;
+use core::mem;
+use core::slice as std_slice;
 
 /// Slice Accessor.
 ///

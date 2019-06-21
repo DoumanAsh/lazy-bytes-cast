@@ -20,13 +20,9 @@
 //!}
 //!```
 
-use ::{
-    marker,
-    mem,
-    ptr
-};
+use core::{marker, mem, ptr};
 
-use to::ToBytesCast;
+use crate::to::ToBytesCast;
 
 ///Unsafe version of `bytes_cast`
 ///

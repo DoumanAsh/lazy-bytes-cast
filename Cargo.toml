@@ -6,6 +6,7 @@ description = "Lazy casts from & to byte arrays"
 repository = "https://github.com/DoumanAsh/lazy-bytes-cast"
 documentation = "https://docs.rs/crate/lazy-bytes-cast/"
 license = "MIT"
+edition = "2018"
 
 [dependencies]
 
