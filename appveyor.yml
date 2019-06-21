@@ -1,11 +1,11 @@
 environment:
   matrix:
   - TARGET: i686-pc-windows-msvc
-    CHANNEL: beta
+    CHANNEL: stable
   - TARGET: x86_64-pc-windows-msvc
-    CHANNEL: beta
+    CHANNEL: stable
   - TARGET: x86_64-pc-windows-gnu
-    CHANNEL: beta
+    CHANNEL: stable
 
 install:
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
@@ -15,8 +15,8 @@ install:
   - cargo -V
 
 build_script:
-  - cargo build
-  - cargo build --no-default-features
+  - cargo check
+  - cargo check --no-default-features
 
 test_script:
   - cargo test

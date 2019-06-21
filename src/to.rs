@@ -18,8 +18,9 @@
 //!```
 
 use core::{marker, mem, ptr};
+#[cfg(not(feature = "std"))]
+use alloc::{vec, vec::Vec};
 
-#[cfg(feature = "std")]
 ///Converts data to a byte array.
 ///
 ///# Note:
@@ -27,10 +28,6 @@ use core::{marker, mem, ptr};
 ///This function limits its usage to data that implements `marker::Copy`
 ///
 ///But it does not guarantee that all types with such trait will be correctly converted.
-///
-///# Note 2:
-///
-///This function is not available without libstd for obvious reasons.
 ///
 ///# Parameters:
 ///
@@ -92,7 +89,6 @@ pub fn copy_bytes<T: marker::Copy>(data: T, to: &mut [u8]) -> Result<(), ()> {
 ///
 ///This trait is implemented for a basic integer that can be safely converted.
 pub unsafe trait ToBytesCast : marker::Copy {
-    #[cfg(feature = "std")]
     ///Converts to bytes.
     fn to_bytes(&self) -> Vec<u8>;
     ///Writes into byte slice.
@@ -106,7 +102,6 @@ macro_rules! impl_to_traits
     ($($t:ty), +) => {
         $(
             unsafe impl ToBytesCast for $t {
-                #[cfg(feature = "std")]
                 #[inline]
                 fn to_bytes(&self) -> Vec<u8> {
                     bytes(*self)

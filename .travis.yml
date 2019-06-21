@@ -1,6 +1,6 @@
 language: rust
 rust:
-  - beta
+  - stable
 
 os:
   - linux
@@ -9,5 +9,6 @@ os:
 sudo: false
 
 script:
-  - cargo build
+  - cargo check --no-default-features
+  - cargo check
   - cargo test
