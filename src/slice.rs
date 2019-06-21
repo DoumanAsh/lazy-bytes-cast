@@ -17,8 +17,7 @@
 //!}
 //!```
 
-use core::mem;
-use core::slice as std_slice;
+use core::{slice, mem};
 
 /// Slice Accessor.
 ///
@@ -27,13 +26,13 @@ pub unsafe trait ByteSlice: Sized {
     /// Returns read-only slice over integer bytes
     fn byte_slice<'a>(&'a self) -> &'a [u8] {
         unsafe {
-            std_slice::from_raw_parts(self as *const _ as *const _, mem::size_of::<Self>())
+            slice::from_raw_parts(self as *const _ as *const _, mem::size_of::<Self>())
         }
     }
     /// Returns mutable slice over integer bytes
     fn byte_mut_slice<'a>(&'a mut self) -> &'a mut [u8] {
         unsafe {
-            std_slice::from_raw_parts_mut(self as *mut _ as *mut _, mem::size_of::<Self>())
+            slice::from_raw_parts_mut(self as *mut _ as *mut _, mem::size_of::<Self>())
         }
     }
 }

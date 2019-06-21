@@ -23,6 +23,14 @@ pub trait IntoByteArray: Copy {
     fn into_byte_array(self) -> Self::Array;
 }
 
+pub trait FromByteArray {
+    ///Type into which to convert.
+    type Array: Copy;
+
+    ///Converts array to self.
+    fn from_byte_array(arr: Self::Array) -> Self;
+}
+
 macro_rules! impl_trait {
     ($($type:ty,)+) => {
         $(
@@ -31,6 +39,14 @@ macro_rules! impl_trait {
 
                 fn into_byte_array(self) -> Self::Array {
                     unsafe { mem::transmute(self) }
+                }
+            }
+
+            impl FromByteArray for $type {
+                type Array = [u8; mem::size_of::<$type>()];
+
+                fn from_byte_array(arr: Self::Array) -> Self {
+                    unsafe { mem::transmute(arr) }
                 }
             }
         )+
