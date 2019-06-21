@@ -3,18 +3,14 @@
 //!# Usage
 //!
 //!```rust
-//!extern crate lazy_bytes_cast;
-//!use lazy_bytes_cast::from::{
-//!   bytes_cast
-//!};
+//!use lazy_bytes_cast::from::{bytes_cast};
 //!
 //!fn main() {
 //!    let bytes = vec![127, 150, 152, 0];
 //!
 //!    if let Some(int) = bytes_cast::<u32>(&bytes) {
 //!        println!("bytes={}", int);
-//!    }
-//!    else {
+//!    } else {
 //!        println!("Couldn't extract integer from bytes");
 //!    }
 //!}

@@ -5,10 +5,7 @@
 //!# Usage
 //!
 //!```rust
-//!use lazy_bytes_cast::slice::{
-//!   ByteSlice,
-//!   ByteIndex
-//!};
+//!use lazy_bytes_cast::slice::{ByteSlice, ByteIndex};
 //!
 //!fn main() {
 //!    let some_int = 666;

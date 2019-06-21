@@ -3,10 +3,7 @@
 //!# Usage
 //!
 //!```rust
-//!extern crate lazy_bytes_cast;
-//!use lazy_bytes_cast::to::{
-//!   ToBytesCast
-//!};
+//!use lazy_bytes_cast::to::{ToBytesCast};
 //!
 //!fn main() {
 //!    let some_int = 666;
