@@ -17,7 +17,7 @@ use core::mem;
 ///Describes conversion to byte array.
 pub trait IntoByteArray: Copy {
     ///Type into which to convert.
-    type Array: Copy;
+    type Array: Copy + AsRef<[u8]> + AsMut<[u8]> + core::borrow::BorrowMut<[u8]> + core::fmt::Debug;
 
     ///Performs conversion of self into `Array`.
     fn into_byte_array(self) -> Self::Array;
@@ -26,7 +26,7 @@ pub trait IntoByteArray: Copy {
 ///Describes conversion from byte array.
 pub trait FromByteArray {
     ///Type into which to convert.
-    type Array: Copy;
+    type Array: Copy + AsRef<[u8]> + AsMut<[u8]> + core::borrow::BorrowMut<[u8]> + core::fmt::Debug;
 
     ///Converts array to self.
     fn from_byte_array(arr: Self::Array) -> Self;
