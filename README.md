@@ -17,11 +17,7 @@ The crates will not take care of byte order for you. Cuz lazy.
 ### Slice integer as bytes
 
 ```rust
-extern crate lazy_bytes_cast;
-use lazy_bytes_cast::slice::{
-   ByteSlice,
-   ByteIndex
-};
+use lazy_bytes_cast::slice::{ByteSlice, ByteIndex};
 
 fn main() {
     let some_int = 666;
@@ -36,18 +32,14 @@ fn main() {
 ### Cast bytes to integer
 
 ```rust
-extern crate lazy_bytes_cast;
-use lazy_bytes_cast::from::{
-   bytes_cast
-};
+use lazy_bytes_cast::from::{bytes_cast};
 
 fn main() {
     let bytes = vec![127, 150, 152, 0];
 
     if let Some(int) = bytes_cast::<u32>(&bytes) {
         println!("bytes={}", int);
-    }
-    else {
+    } else {
         println!("Couldn't extract integer from bytes");
     }
 }
@@ -56,10 +48,7 @@ fn main() {
 ### Cast integer to bytes
 
 ```rust
-extern crate lazy_bytes_cast;
-use lazy_bytes_cast::to::{
-   ToBytesCast
-};
+use lazy_bytes_cast::to::{ToBytesCast};
 
 fn main() {
     let some_int = 666;
