@@ -50,6 +50,8 @@
 //!}
 //!```
 
+#![warn(missing_docs)]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::style))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]

@@ -23,6 +23,7 @@ pub trait IntoByteArray: Copy {
     fn into_byte_array(self) -> Self::Array;
 }
 
+///Describes conversion from byte array.
 pub trait FromByteArray {
     ///Type into which to convert.
     type Array: Copy;

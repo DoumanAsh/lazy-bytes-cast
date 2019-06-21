@@ -24,13 +24,13 @@ use core::{slice, mem};
 /// Note that one must be careful when impl this trait for own types.
 pub unsafe trait ByteSlice: Sized {
     /// Returns read-only slice over integer bytes
-    fn byte_slice<'a>(&'a self) -> &'a [u8] {
+    fn byte_slice(&self) -> &[u8] {
         unsafe {
             slice::from_raw_parts(self as *const _ as *const _, mem::size_of::<Self>())
         }
     }
     /// Returns mutable slice over integer bytes
-    fn byte_mut_slice<'a>(&'a mut self) -> &'a mut [u8] {
+    fn byte_mut_slice(&mut self) -> &mut [u8] {
         unsafe {
             slice::from_raw_parts_mut(self as *mut _ as *mut _, mem::size_of::<Self>())
         }
@@ -38,7 +38,7 @@ pub unsafe trait ByteSlice: Sized {
 }
 
 /// Indexing Accessor.
-pub unsafe trait ByteIndex : ByteSlice {
+pub unsafe trait ByteIndex: ByteSlice {
     /// Returns byte from integer by index.
     ///
     ///# Parameters:
