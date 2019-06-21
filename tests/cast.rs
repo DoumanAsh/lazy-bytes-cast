@@ -114,6 +114,11 @@ fn test_bytes_from_array() {
 
     let result: u64 = arr.cast_to();
     assert_eq!(result, expected);
+
+    let arr = [1u8, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2];
+    let expected = 2663668650376831415897714446754185473u128;
+    let result: u128 = arr.cast_to();
+    assert_eq!(result, expected);
 }
 
 #[test]
@@ -143,7 +148,13 @@ fn test_copy_to_bytes() {
     let var_from = 9999999;
 
     assert!(var_from.copy_to_bytes(&mut arr[1..]).is_ok());
-    assert_eq!(arr, [0, 127, 150, 152, 0, 0, 0, 0])
+    assert_eq!(arr, [0, 127, 150, 152, 0, 0, 0, 0]);
+
+    let mut arr = [0u8; 16];
+    let var_from = 2663668650376831415897714446754185473u128;
+
+    assert!(var_from.copy_to_bytes(&mut arr[..]).is_ok());
+    assert_eq!(arr, [1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2]);
 }
 
 #[test]

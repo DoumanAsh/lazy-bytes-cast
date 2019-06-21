@@ -133,6 +133,7 @@ macro_rules! impl_from_traits_arr
 impl_from_traits_arr!(
     [u32; 4], [i32; 4], [f32; 4],
     [u64; 8], [i64; 8], [f64; 8],
+    [i128; 16], [u128; 16],
     [u16; 2], [i16; 2]
 );
 
@@ -168,6 +169,19 @@ macro_rules! impl_from_traits_tuple8
         )+
     };
 }
+macro_rules! impl_from_traits_tuple16
+{
+    ($($t:ty),+) => {
+        $(
+            unsafe impl FromBytesCastLazy<$t> for (u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8, u8) {
+                #[inline]
+                fn cast_to(&self) -> $t {
+                    [self.0, self.1, self.2, self.3, self.4, self.5, self.6, self.7, self.8, self.9, self.10, self.11, self.12, self.13, self.14, self.15].cast_to()
+                }
+            }
+        )+
+    };
+}
 macro_rules! impl_from_traits_tuple2
 {
     ($($t:ty),+) => {
@@ -185,6 +199,7 @@ macro_rules! impl_from_traits_tuple2
 impl_from_traits_tuple2!(i16, u16);
 impl_from_traits_tuple4!(i32, u32, f32);
 impl_from_traits_tuple8!(i64, u64, f64);
+impl_from_traits_tuple16!(i128, u128);
 
 #[cfg(target_pointer_width = "64")]
 impl_from_traits_tuple8!(isize, usize);
