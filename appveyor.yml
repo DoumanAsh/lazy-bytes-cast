@@ -16,7 +16,6 @@ install:
 
 build_script:
   - cargo check
-  - cargo check --no-default-features
 
 test_script:
   - cargo test

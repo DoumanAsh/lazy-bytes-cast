@@ -9,6 +9,5 @@ os:
 sudo: false
 
 script:
-  - cargo check --no-default-features
   - cargo check
   - cargo test
