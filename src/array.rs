@@ -1,16 +1,4 @@
-//!Conversion to static array
-//!
-//!# Usage
-//!
-//!```rust
-//!use lazy_bytes_cast::array::IntoByteArray;
-//!
-//!fn main() {
-//!    let array = 666.into_byte_array();
-//!
-//!    println!("bytes={:?}", array);
-//!}
-//!```
+//! Array conversion
 
 use core::mem;
 

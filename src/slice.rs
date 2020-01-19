@@ -1,68 +1,108 @@
-//!Slice accessors
+//! Slice conversion module
 //!
-//!Provides traits to access integers as byte slices.
-//!
-//!# Usage
-//!
-//!```rust
-//!use lazy_bytes_cast::slice::{ByteSlice, ByteIndex};
-//!
-//!fn main() {
-//!    let some_int = 666;
-//!
-//!    for (idx, byte) in some_int.byte_slice().iter().enumerate() {
-//!        assert_eq!(some_int.byte(idx).unwrap(), *byte);
-//!        println!("bytes[{}]={}", idx, byte);
-//!    }
-//!}
-//!```
+//! Provides utilities to treat arbitrary types as slice of bytes
 
 use core::{slice, mem};
 
-/// Slice Accessor.
+#[inline]
+///Access value as slice of bytes
+pub unsafe fn as_slice<T: Sized>(val: &T) -> &[u8] {
+    slice::from_raw_parts(val as *const _ as *const _, mem::size_of::<T>())
+}
+
+#[inline]
+///Access value as mutable slice of bytes
+pub unsafe fn as_slice_mut<T: Sized>(val: &mut T) -> &mut [u8] {
+    slice::from_raw_parts_mut(val as *mut _ as *mut _, mem::size_of::<T>())
+}
+
+#[inline]
+///Get reference to the value from slice
+pub unsafe fn as_type<T: Sized>(slice: &[u8]) -> Option<&T> {
+    if mem::size_of::<T>() == slice.len() {
+        Some(as_type_unchecked(slice))
+    } else {
+        None
+    }
+}
+
+#[inline]
+///Get mutable reference to the value from slice
+pub unsafe fn as_type_mut<T: Sized>(slice: &mut [u8]) -> Option<&mut T> {
+    if mem::size_of::<T>() == slice.len() {
+        Some(as_type_mut_unchecked(slice))
+    } else {
+        None
+    }
+}
+
+#[inline]
+///Get reference to the value from slice
 ///
-/// Note that one must be careful when impl this trait for own types.
-pub unsafe trait ByteSlice: Sized {
-    /// Returns read-only slice over integer bytes
-    fn byte_slice(&self) -> &[u8] {
+///This function is UB if `slice.len() < mem::size_of::<T>()`
+pub unsafe fn as_type_unchecked<T: Sized>(slice: &[u8]) -> &T {
+    &*(slice.as_ptr() as *const T)
+}
+
+#[inline]
+///Get mutable reference to the value from slice
+///
+///This function is UB if `slice.len() < mem::size_of::<T>()`
+pub unsafe fn as_type_mut_unchecked<T: Sized>(slice: &mut [u8]) -> &mut T {
+    &mut *(slice.as_mut_ptr() as *mut T)
+}
+
+/// Trait which should be implemented for types that are safe to treat as byte
+///
+/// While it is possible to consider all types as bytes, it doesn't make sense for some (e.g.  `Vec`)
+pub unsafe trait AsByteSlice: Sized {
+    #[inline]
+    ///Access value as slice of bytes
+    fn as_slice(&self) -> &[u8] {
         unsafe {
-            slice::from_raw_parts(self as *const _ as *const _, mem::size_of::<Self>())
+            as_slice(self)
         }
     }
-    /// Returns mutable slice over integer bytes
-    fn byte_mut_slice(&mut self) -> &mut [u8] {
+
+    #[inline]
+    ///Access value as mutable slice of bytes
+    fn as_slice_mut(&mut self) -> &mut [u8] {
         unsafe {
-            slice::from_raw_parts_mut(self as *mut _ as *mut _, mem::size_of::<Self>())
+            as_slice_mut(self)
         }
     }
 }
 
-/// Indexing Accessor.
-pub unsafe trait ByteIndex: ByteSlice {
-    /// Returns byte from integer by index.
-    ///
-    ///# Parameters:
-    ///
-    ///* `idx` - Index of byte starting from 0.
-    ///
-    ///# Result:
-    ///
-    ///* `Some` - Contains byte.
-    ///* `None` - Index out of bounds.
-    fn byte(&self, idx: usize) -> Option<u8> {
-        if idx >= mem::size_of::<Self>() {
-            return None;
-        }
+/// Trait, which implements accessing type as reference from byte slice.
+///
+/// This is safe as long as type implements `AsByteSlice` correctly.
+pub trait ByteSliceAsType {
+    ///Gets reference
+    fn as_type<T: AsByteSlice>(&self) -> Option<&T>;
+    ///Gets mutable reference
+    fn as_type_mut<T: AsByteSlice>(&mut self) -> Option<&mut T>;
+}
 
-        Some(self.byte_slice()[idx])
+impl ByteSliceAsType for [u8] {
+    #[inline]
+    fn as_type<T: AsByteSlice>(&self) -> Option<&T> {
+        unsafe {
+            as_type(self)
+        }
+    }
+
+    #[inline]
+    fn as_type_mut<T: AsByteSlice>(&mut self) -> Option<&mut T> {
+        unsafe {
+            as_type_mut(self)
+        }
     }
 }
 
 macro_rules! impl_trait {
     ($($type:ty,)+) => {
         $(
-            unsafe impl ByteSlice for $type {}
-            unsafe impl ByteIndex for $type {}
+            unsafe impl AsByteSlice for $type {}
         )+
     }
 }

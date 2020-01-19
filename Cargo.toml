@@ -1,15 +1,13 @@
 [package]
 name = "lazy-bytes-cast"
-version = "2.3.0"
+version = "3.0.0"
 authors = ["Douman <douman@gmx.se>"]
 description = "Lazy casts from & to byte arrays"
 repository = "https://github.com/DoumanAsh/lazy-bytes-cast"
 documentation = "https://docs.rs/crate/lazy-bytes-cast/"
-license = "MIT"
+license = "BSL-1.0"
 edition = "2018"
 
 [dependencies]
 
 [features]
-default = ["std"]
-std = []
