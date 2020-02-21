@@ -40,6 +40,8 @@ pub unsafe fn as_type_mut<T: Sized>(slice: &mut [u8]) -> Option<&mut T> {
 ///Get reference to the value from slice
 ///
 ///This function is UB if `slice.len() < mem::size_of::<T>()`
+///
+///Also might be UB if `mem::align_if::<T>() > 1`
 pub unsafe fn as_type_unchecked<T: Sized>(slice: &[u8]) -> &T {
     &*(slice.as_ptr() as *const T)
 }
@@ -48,6 +50,8 @@ pub unsafe fn as_type_unchecked<T: Sized>(slice: &[u8]) -> &T {
 ///Get mutable reference to the value from slice
 ///
 ///This function is UB if `slice.len() < mem::size_of::<T>()`
+///
+///Also might be UB if `mem::align_if::<T>() > 1`
 pub unsafe fn as_type_mut_unchecked<T: Sized>(slice: &mut [u8]) -> &mut T {
     &mut *(slice.as_mut_ptr() as *mut T)
 }
