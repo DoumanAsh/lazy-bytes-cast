@@ -17,7 +17,7 @@ pub unsafe fn as_slice_mut<T: Sized>(val: &mut T) -> &mut [u8] {
 }
 
 #[inline]
-///Get reference to the value from slice
+///Get reference to the value from slice, using `as_type_unchecked`
 pub unsafe fn as_type<T: Sized>(slice: &[u8]) -> Option<&T> {
     if mem::size_of::<T>() == slice.len() {
         Some(as_type_unchecked(slice))
@@ -27,7 +27,7 @@ pub unsafe fn as_type<T: Sized>(slice: &[u8]) -> Option<&T> {
 }
 
 #[inline]
-///Get mutable reference to the value from slice
+///Get mutable reference to the value from slice, using `as_type_mut_unchecked`
 pub unsafe fn as_type_mut<T: Sized>(slice: &mut [u8]) -> Option<&mut T> {
     if mem::size_of::<T>() == slice.len() {
         Some(as_type_mut_unchecked(slice))
@@ -77,32 +77,6 @@ pub unsafe trait AsByteSlice: Sized {
     }
 }
 
-/// Trait, which implements accessing type as reference from byte slice.
-///
-/// This is safe as long as type implements `AsByteSlice` correctly.
-pub trait ByteSliceAsType {
-    ///Gets reference
-    fn as_type<T: AsByteSlice>(&self) -> Option<&T>;
-    ///Gets mutable reference
-    fn as_type_mut<T: AsByteSlice>(&mut self) -> Option<&mut T>;
-}
-
-impl ByteSliceAsType for [u8] {
-    #[inline]
-    fn as_type<T: AsByteSlice>(&self) -> Option<&T> {
-        unsafe {
-            as_type(self)
-        }
-    }
-
-    #[inline]
-    fn as_type_mut<T: AsByteSlice>(&mut self) -> Option<&mut T> {
-        unsafe {
-            as_type_mut(self)
-        }
-    }
-}
-
 macro_rules! impl_trait {
     ($($type:ty,)+) => {
         $(
@@ -112,3 +86,56 @@ macro_rules! impl_trait {
 }
 
 impl_trait!(u8, i8, u16, i16, u32, i32, f32, u64, i64, f64, usize, isize, i128, u128,);
+
+///Describes a way to read byte slice into particular type.
+pub trait ReadByteSlice: crate::FromByteArray + Sized {
+    ///Reads from byte slice, converting consumed bytes into `Self`
+    ///
+    ///Modifying existing slice by taking away required bytes.
+    ///
+    ///When slice has insufficient size, returns `None`
+    fn read_byte_slice(slice: &mut &[u8]) -> Option<Self> {
+        if slice.len() < mem::size_of::<Self::Array>() {
+            return None;
+        }
+
+        Some(unsafe {
+            Self::read_byte_slice_unchecked(slice)
+        })
+    }
+
+    ///Unsafe version of `read_byte_slice`, that doesn't perform length check.
+    unsafe fn read_byte_slice_unchecked(slice: &mut &[u8]) -> Self {
+        let (convert, remains) = slice.split_at(mem::size_of::<Self::Array>());
+        *slice = remains;
+        //This is fine because we know that slice has enough bytes
+        let convert = convert.as_ptr() as *const Self::Array;
+
+        Self::from_byte_array(*convert)
+    }
+}
+
+impl<T: crate::FromByteArray> ReadByteSlice for T {}
+
+///Describes a way to read byte slice into particular type.
+pub trait FromByteSlice: crate::FromByteArray + Sized {
+    #[inline]
+    ///Converts slice into `Self` only if `mem::size_of::<Self>() == slice.len()`
+    fn from_slice(slice: &[u8]) -> Option<Self> {
+        if mem::size_of::<Self>() == slice.len() {
+            Some(unsafe {
+                Self::from_slice_unchecked(slice)
+            })
+        } else {
+            None
+        }
+    }
+
+    ///Converts slice into `Self` without performing any checks.
+    unsafe fn from_slice_unchecked(slice: &[u8]) -> Self {
+        let slice = slice.as_ptr() as *const Self::Array;
+        Self::from_byte_array(*slice)
+    }
+}
+
+impl<T: crate::FromByteArray> FromByteSlice for T {}
