@@ -12,7 +12,7 @@ pub trait IntoByteArray: Copy {
 }
 
 ///Describes conversion from byte array.
-pub trait FromByteArray {
+pub unsafe trait FromByteArray {
     ///Type into which to convert.
     type Array: Copy + AsRef<[u8]> + AsMut<[u8]> + core::borrow::BorrowMut<[u8]> + core::fmt::Debug;
 
@@ -31,7 +31,7 @@ macro_rules! impl_trait {
                 }
             }
 
-            impl FromByteArray for $type {
+            unsafe impl FromByteArray for $type {
                 type Array = [u8; mem::size_of::<$type>()];
 
                 fn from_byte_array(arr: Self::Array) -> Self {
