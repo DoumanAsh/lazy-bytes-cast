@@ -89,6 +89,7 @@ impl_trait!(u8, i8, u16, i16, u32, i32, f32, u64, i64, f64, usize, isize, i128, 
 
 ///Describes a way to read byte slice into particular type.
 pub trait ReadByteSlice: crate::FromByteArray + Sized {
+    #[inline]
     ///Reads from byte slice, converting consumed bytes into `Self`
     ///
     ///Modifying existing slice by taking away required bytes.
@@ -131,6 +132,7 @@ pub trait FromByteSlice: crate::FromByteArray + Sized {
         }
     }
 
+    #[inline]
     ///Converts slice into `Self` without performing any checks.
     unsafe fn from_slice_unchecked(slice: &[u8]) -> Self {
         let slice = slice.as_ptr() as *const Self::Array;

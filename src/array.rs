@@ -26,6 +26,7 @@ macro_rules! impl_trait {
             impl IntoByteArray for $type {
                 type Array = [u8; mem::size_of::<$type>()];
 
+                #[inline(always)]
                 fn into_byte_array(self) -> Self::Array {
                     unsafe { mem::transmute(self) }
                 }
@@ -34,6 +35,7 @@ macro_rules! impl_trait {
             unsafe impl FromByteArray for $type {
                 type Array = [u8; mem::size_of::<$type>()];
 
+                #[inline(always)]
                 fn from_byte_array(arr: Self::Array) -> Self {
                     unsafe { mem::transmute(arr) }
                 }
