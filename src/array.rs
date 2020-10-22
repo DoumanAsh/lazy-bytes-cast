@@ -2,42 +2,42 @@
 
 use core::mem;
 
-///Describes conversion to byte array.
-pub trait IntoByteArray: Copy {
+///Describes conversion to bytes representation
+pub trait IntoBytes: Copy {
     ///Type into which to convert.
     type Array: Copy + AsRef<[u8]> + AsMut<[u8]> + core::borrow::BorrowMut<[u8]> + core::fmt::Debug;
 
     ///Performs conversion of self into `Array`.
-    fn into_byte_array(self) -> Self::Array;
+    fn into_bytes(self) -> Self::Array;
 }
 
-///Describes conversion from byte array.
-pub unsafe trait FromByteArray {
+///Describes conversion from bytes representation
+pub unsafe trait FromBytes {
     ///Type into which to convert.
     type Array: Copy + AsRef<[u8]> + AsMut<[u8]> + core::borrow::BorrowMut<[u8]> + core::fmt::Debug;
 
     ///Converts array to self.
-    fn from_byte_array(arr: Self::Array) -> Self;
+    fn from_bytes(arr: Self::Array) -> Self;
 }
 
 macro_rules! impl_trait {
     ($($type:ty,)+) => {
         $(
-            impl IntoByteArray for $type {
+            impl IntoBytes for $type {
                 type Array = [u8; mem::size_of::<$type>()];
 
                 #[inline(always)]
-                fn into_byte_array(self) -> Self::Array {
-                    unsafe { mem::transmute(self) }
+                fn into_bytes(self) -> Self::Array {
+                    self.to_ne_bytes()
                 }
             }
 
-            unsafe impl FromByteArray for $type {
+            unsafe impl FromBytes for $type {
                 type Array = [u8; mem::size_of::<$type>()];
 
                 #[inline(always)]
-                fn from_byte_array(arr: Self::Array) -> Self {
-                    unsafe { mem::transmute(arr) }
+                fn from_bytes(arr: Self::Array) -> Self {
+                    Self::from_ne_bytes(arr)
                 }
             }
         )+
