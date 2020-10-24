@@ -47,7 +47,7 @@ pub trait Bits: Copy + Sized + Not<Output=Self> + BitXor<Output=Self> + BitOr<Ou
     }
 
     #[inline]
-    ///Gets bit by index
+    ///Toggles bit by index
     fn toggle_bit(&mut self, idx: u8) {
         *self = self.bitxor(Self::from(1u8).shl(Self::from(idx)))
     }
