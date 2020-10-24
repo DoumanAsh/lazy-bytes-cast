@@ -27,10 +27,12 @@
 #![no_std]
 
 mod array;
+mod bits;
 mod slice;
 
 pub use array::{FromBytes, IntoBytes};
 pub use slice::{ReadBytes, AsBytes};
+pub use bits::Bits;
 
 #[inline(always)]
 ///Read u16 at compile time.
