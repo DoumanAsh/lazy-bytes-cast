@@ -1,75 +1,168 @@
 //!This crate provides simple methods to cast from and into byte arrays.
 //!
-//!# Example
-//!
-//!```rust
-//!
-//! use lazy_bytes_cast::{FromBytes, IntoBytes, read_u32, read_u64, read_u128, read_u16, ReadBytes};
-//!
-//! let val = 9999999u32;
-//! let bytes = [127u8, 150, 152, 0];
-//! let mut bytes_slice = &bytes[..];
-//! assert_eq!(val.into_bytes(), bytes);
-//!
-//! assert_eq!(u32::from_bytes(bytes), val);
-//! assert_eq!(u32::from_bytes(bytes), read_u32(&bytes, 0));
-//! assert_eq!(u32::from_bytes(bytes), bytes_slice.read_value::<u32>().unwrap());
-//! assert_eq!(bytes_slice.len(), 0);
-//! assert!(bytes_slice.read_value::<u32>().is_none());
-//!
-//! assert_eq!(read_u16(&u16::max_value().to_ne_bytes(), 0), u16::max_value());
-//! assert_eq!(read_u64(&u64::max_value().to_ne_bytes(), 0), u64::max_value());
-//! assert_eq!(read_u128(&u128::max_value().to_ne_bytes(), 0), u128::max_value());
-//!```
 
 #![warn(missing_docs)]
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::style))]
 #![no_std]
 
-mod array;
-mod bits;
-mod slice;
-
-pub use array::{FromBytes, IntoBytes};
-pub use slice::{ReadBytes, AsBytes};
-pub use bits::Bits;
-
-#[inline(always)]
-///Read u16 at compile time.
+#[macro_export]
+///Macro to read integer from bytes.
 ///
-///`cursor` allows to specify position in slice, allowing avoid the need for slicing
-pub const fn read_u16(input: &[u8], cursor: usize) -> u16 {
-    u16::from_ne_bytes([input[cursor], input[cursor + 1]])
+///## Params
+///
+///- `input` - name of byte array/slice, available in current scope;
+///- `idx` - offset from where to read, assumed to be usize;
+///- `as` - type of integer to return;
+///
+///## Usage
+///
+///```rust
+///use lazy_bytes_cast::read_num;
+///const BYTES: [u8; 5] = [255u8, 255u8, 255u8, 255u8, 0u8];
+/////Const friendly
+///const RESULT: u32 = read_num!(BYTES as u32);
+///const OPTION_RESULT: Option<u32> = read_num!(try BYTES as u32);
+///
+///assert_eq!(RESULT, u32::max_value());
+///assert_eq!(OPTION_RESULT, Some(RESULT));
+///assert_eq!(read_num!(BYTES as u32), u32::max_value());
+/////[idx] is offset from start
+///assert_ne!(read_num!(BYTES[1] as u32), u32::max_value());
+///
+///assert!(read_num!(try BYTES as u32).is_some());
+///assert!(read_num!(try BYTES[1] as u32).is_some());
+///assert!(read_num!(try BYTES[2] as u32).is_none());
+///assert!(read_num!(try BYTES[255] as u32).is_none());
+///
+///assert!(read_num!(try BYTES[2] as u8).is_some());
+///assert!(read_num!(try BYTES[3] as u8).is_some());
+///assert!(read_num!(try BYTES[4] as u8).is_some());
+///assert!(read_num!(try BYTES[5] as u8).is_none());
+///```
+///
+///## Panics
+///
+///On index out of bounds unless special `try` version is used, which returns `Option`
+macro_rules! read_num {
+    ($input:ident as $as:ty) => {
+        $crate::read_num!($input[0] as $as)
+    };
+    (try $input:ident as $as:ty) => {
+        $crate::read_num!(try $input[0] as $as)
+    };
+    ($input:ident[$idx:expr] as $as:ty) => {
+        match $input {
+            input => {
+                let mut bytes = [0u8; core::mem::size_of::<$as>()];
+                let mut idx = 0;
+                let offset = $idx as usize;
+                while idx < bytes.len() {
+                    bytes[idx] = input[offset.wrapping_add(idx)];
+                    idx = idx.wrapping_add(1);
+                }
+
+                <$as>::from_ne_bytes(bytes)
+            }
+        }
+    };
+    (try $input:ident[$idx:expr] as $as:ty) => {
+        match $input {
+            input => {
+                const TYPE_LEN: usize = core::mem::size_of::<$as>();
+                let offset = $idx as usize;
+                if input.len().saturating_sub(offset) >= TYPE_LEN {
+                    let mut bytes = [0u8; TYPE_LEN];
+                    let mut idx = 0;
+                    while idx < TYPE_LEN {
+                        bytes[idx] = input[offset.wrapping_add(idx)];
+                        idx = idx.wrapping_add(1);
+                    }
+
+                    Some(<$as>::from_ne_bytes(bytes))
+                } else {
+                    None
+                }
+            }
+        }
+    }
 }
 
-#[inline(always)]
-///Read u32 at compile time.
+#[macro_export]
+///Macro to manipulate bits within integer
 ///
-///`cursor` allows to specify position in slice, allowing avoid the need for slicing
-pub const fn read_u32(input: &[u8], cursor: usize) -> u32 {
-    u32::from_ne_bytes([input[cursor], input[cursor + 1], input[cursor + 2], input[cursor + 3]])
-}
-
-#[inline(always)]
-///Read u64 at compile time.
+///## Example
 ///
-///`cursor` allows to specify position in slice, allowing avoid the need for slicing
-pub const fn read_u64(input: &[u8], cursor: usize) -> u64 {
-    u64::from_ne_bytes([
-        input[cursor], input[cursor + 1], input[cursor + 2], input[cursor + 3],
-        input[cursor + 4], input[cursor + 5], input[cursor + 6], input[cursor + 7],
-    ])
-}
-
-#[inline(always)]
-///Read u128 at compile time.
+///```
+///use lazy_bytes_cast::bit;
 ///
-///`cursor` allows to specify position in slice, allowing avoid the need for slicing
-pub const fn read_u128(input: &[u8], cursor: usize) -> u128 {
-    u128::from_ne_bytes([
-        input[cursor], input[cursor + 1], input[cursor + 2], input[cursor + 3],
-        input[cursor + 4], input[cursor + 5], input[cursor + 6], input[cursor + 7],
-        input[cursor + 8], input[cursor + 9], input[cursor + 10], input[cursor + 11],
-        input[cursor + 12], input[cursor + 13], input[cursor + 14], input[cursor + 15],
-    ])
+///let mut res = u32::max_value();
+///assert!(!bit!(empty res));
+///
+///assert!(bit!(get res[1]));
+///
+///bit!(set res[1]);
+///assert!(bit!(get res[1]));
+///
+///bit!(toggle res[1]);
+///assert!(!bit!(get res[1]));
+///
+///bit!(unset res[1]);
+///assert!(!bit!(get res[1]));
+///
+///bit!(toggle res[1]);
+///assert!(bit!(get res[1]));
+///bit!(reset res);
+///assert_eq!(res, 0);
+///
+///assert!(!bit!(get res[1]));
+///bit!(toggle res[1]);
+///assert_ne!(res, 0);
+///
+///assert_eq!(bit!(size res), 4 * 8);
+///let mut res = u32::min_value();
+///
+///assert!(bit!(empty res));
+///assert!(!bit!(get res[1]));
+///
+///bit!(set res[1]);
+///assert!(bit!(get res[1]));
+///bit!(unset res[1]);
+///assert!(!bit!(get res[1]));
+///
+///bit!(set res[26]);
+///assert!(bit!(get res[26]));
+///assert!(bit!(get res[90])); //90 % 32 == 26
+///
+///bit!(flip res);
+///assert!(!bit!(get res[26]));
+///assert!(bit!(get res[5]));
+///```
+macro_rules! bit {
+    (get $input:ident[$idx:expr]) => {
+        ($input.wrapping_shr($idx)) & 1 != 0
+    };
+    (set $input:ident[$idx:expr]) => {
+        $input |= 1 << ($idx)
+    };
+    (unset $input:ident[$idx:expr]) => {
+        $input &= !(1 << $idx)
+    };
+    (toggle $input:ident[$idx:expr]) => {
+        $input ^= 1 << $idx
+    };
+    (empty $input:ident) => {
+        $input == 0
+    };
+    (reset $input:ident) => {
+        $input = 0
+    };
+    (flip $input:ident) => {
+        $input = $input.reverse_bits()
+    };
+    (size $input:ident) => {
+        core::mem::size_of_val(&$input) * 8
+    }
+    //($input:ident[$idx:expr]=$val:expr) => {
+    //    $input = ($input & !(1 << $idx)) | (($val as _) << $idx);
+    //}
 }
