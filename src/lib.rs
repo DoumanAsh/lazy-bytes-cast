@@ -5,8 +5,11 @@
 #![cfg_attr(feature = "cargo-clippy", allow(clippy::style))]
 #![no_std]
 
+mod array;
+pub use array::{IntoBytes, FromBytes};
+
 #[macro_export]
-///Macro to read integer from bytes.
+///Macro to read integer from bytes, suitable for `const fn`
 ///
 ///## Params
 ///
@@ -88,7 +91,7 @@ macro_rules! read_num {
 }
 
 #[macro_export]
-///Macro to manipulate bits within integer
+///Macro to manipulate bits within integer, suitable for `const fn`
 ///
 ///## Example
 ///
