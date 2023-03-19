@@ -1,4 +1,3 @@
-//!Array related utilities
 use core::{mem, ptr, marker};
 
 const unsafe fn transmute_slice<IN, OUT>(val: &IN) -> &[OUT] {
@@ -27,12 +26,14 @@ pub unsafe trait Pod: Copy {
 
 macro_rules! impl_pod {
     ($($ty:ident),*) => {$(
-        unsafe impl Pod for $ty {}
+        unsafe impl Pod for $ty {
+        }
     )*};
 }
 
 impl_pod!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize);
-unsafe impl<T: Pod> Pod for mem::ManuallyDrop<T> {}
+unsafe impl<T: Pod> Pod for mem::ManuallyDrop<T> {
+}
 
 struct Validator<IN, OUT> {
     _result: marker::PhantomData<(IN, OUT)>,
@@ -153,13 +154,13 @@ pub fn byte_slice_mut_from<T: Pod>(val: &mut T) -> &mut [u8] {
 ///## Usage
 ///
 ///```
-///use lazy_bytes_cast::bytes_from;
+///use lazy_bytes_cast::to_bytes;
 ///
 ///const INPUT: [u8; 4] = [123, 25, 99, 250];
-///static BYTES: [u8; 4] = bytes_from(&u32::from_ne_bytes(INPUT));
+///static BYTES: [u8; 4] = to_bytes(&u32::from_ne_bytes(INPUT));
 ///assert_eq!(BYTES, INPUT);
 ///
-///static HALF: [u8; 2] = bytes_from(&u32::from_ne_bytes(INPUT));
+///static HALF: [u8; 2] = to_bytes(&u32::from_ne_bytes(INPUT));
 ///assert_eq!(HALF, &INPUT[..2]);
 ///```
 ///
@@ -168,11 +169,11 @@ pub fn byte_slice_mut_from<T: Pod>(val: &mut T) -> &mut [u8] {
 ///Compilation fails if `val` doesn't have enough bytes to read from.
 ///
 ///```compile_fail
-///use lazy_bytes_cast::bytes_from;
+///use lazy_bytes_cast::to_bytes;
 ///
-///static BYTES: [u8; 5] = bytes_from(&0u32);
+///static BYTES: [u8; 5] = to_bytes(&0u32);
 ///```
-pub const fn bytes_from<T: Pod, const N: usize>(val: &T) -> [u8; N] {
+pub const fn to_bytes<T: Pod, const N: usize>(val: &T) -> [u8; N] {
     let _ = Validator::<T, [u8; N]>::IS_ENOUGH_BYTES;
     unsafe {
         transmute_ref(val)
