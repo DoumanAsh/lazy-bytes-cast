@@ -50,8 +50,7 @@ impl<IN, OUT: Copy> Validator<IN, OUT> {
 
 ///Gets uninit byte slice out of the type.
 ///
-///Because type of any size can be safely represented as slice of uninitialized bytes, this
-///method is safe to use.
+///Because type of any size can be safely represented as slice of uninitialized bytes, this method is safe to use.
 ///It is up to user to interpret result correctly and safe.
 ///
 ///## Usage
@@ -77,6 +76,38 @@ pub const fn uninit_byte_slice_from<T>(val: &T) -> &[mem::MaybeUninit<u8>] {
     let _ = Validator::<T, &[u8]>::IS_NOT_ZST;
     unsafe {
         transmute_slice(val)
+    }
+}
+
+///Gets mutable uninit byte slice out of the type.
+///
+///It is up to user to interpret result correctly and safe.
+///
+///## Usage
+///
+///```
+///use lazy_bytes_cast::uninit_byte_slice_mut_from;
+///
+///let bytes = unsafe {
+///    uninit_byte_slice_mut_from(&mut 0u32)
+///};
+///```
+///
+///## Restrictions
+///
+///Compilation fails for invalid type.
+///
+///```compile_fail
+///use lazy_bytes_cast::uninit_byte_slice_mut_from;
+///
+///let bytes = unsafe {
+///    uninit_byte_slice_mut_from(&mut ())
+///};
+///```
+pub unsafe fn uninit_byte_slice_mut_from<T>(val: &mut T) -> &mut [mem::MaybeUninit<u8>] {
+    let _ = Validator::<T, &[u8]>::IS_NOT_ZST;
+    unsafe {
+        transmute_slice_mut(val)
     }
 }
 
