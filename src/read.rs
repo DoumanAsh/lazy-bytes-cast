@@ -4,7 +4,7 @@ use core::{mem, marker};
 
 //To avoid unaligned read, wait until `ptr::read_unaligned` is stable to remove it
 #[repr(packed(1))]
-struct Out<T>(pub T);
+pub(crate) struct Out<T>(pub T);
 
 #[derive(Copy, Clone)]
 ///Byte slice reader.

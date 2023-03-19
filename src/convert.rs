@@ -1,5 +1,7 @@
 use core::{mem, ptr, marker};
 
+use crate::read::Out;
+
 const unsafe fn transmute_slice<IN, OUT>(val: &IN) -> &[OUT] {
     &*ptr::slice_from_raw_parts(val as *const IN as *const OUT, mem::size_of::<IN>())
 }
@@ -10,14 +12,6 @@ unsafe fn transmute_slice_mut<IN, OUT>(val: &mut IN) -> &mut [OUT] {
 
 const unsafe fn transmute_ref<IN, OUT: Copy>(val: &IN) -> OUT {
     *(mem::transmute::<_, &mem::MaybeUninit<OUT>>(val).assume_init_ref())
-}
-
-unsafe fn transmute_ref_unaligned<IN, OUT: Copy>(val: &IN) -> OUT {
-    let mut out = mem::MaybeUninit::<OUT>::uninit();
-    unsafe {
-        ptr::copy_nonoverlapping(val as *const IN as *const u8, out.as_mut_ptr() as *mut u8, mem::size_of::<OUT>());
-        out.assume_init()
-    }
 }
 
 ///Marker indicating that it is plain old data.
@@ -51,13 +45,6 @@ impl<IN, OUT: Copy> Validator<IN, OUT> {
 
     const IS_ENOUGH_BYTES: () = {
         assert!(mem::size_of::<IN>() >= mem::size_of::<OUT>());
-    };
-    const READ_FN: unsafe fn(&IN) -> OUT = {
-        if mem::align_of::<OUT>() > mem::align_of::<IN>() {
-            transmute_ref_unaligned
-        } else {
-            transmute_ref
-        }
     };
 }
 
@@ -187,9 +174,9 @@ pub const fn to_bytes<T: Pod, const N: usize>(val: &T) -> [u8; N] {
 ///```
 ///use lazy_bytes_cast::from_bytes;
 ///
-///let input = 500_900_100u32;
-///let res: u32 = from_bytes(&input.to_ne_bytes());
-///assert_eq!(res, input);
+///const INPUT: u32 = 500_900_100;
+///const RES: u32 = from_bytes(&INPUT.to_ne_bytes());
+///assert_eq!(RES, INPUT);
 ///```
 ///
 ///## Restrictions
@@ -201,9 +188,9 @@ pub const fn to_bytes<T: Pod, const N: usize>(val: &T) -> [u8; N] {
 ///
 ///let res: u32 = from_bytes(&[1, 2, 3]);
 ///```
-pub fn from_bytes<T: Pod, const N: usize>(val: &[u8; N]) -> T {
+pub const fn from_bytes<T: Pod, const N: usize>(val: &[u8; N]) -> T {
     let _ = Validator::<[u8; N], T>::IS_SAME_SIZE;
     unsafe {
-        Validator::<[u8; N], T>::READ_FN(val)
+        (*(val.as_ptr() as *const Out<T>)).0
     }
 }
