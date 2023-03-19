@@ -48,6 +48,7 @@ impl<IN, OUT: Copy> Validator<IN, OUT> {
     };
 }
 
+#[inline]
 ///Gets uninit byte slice out of the type.
 ///
 ///Because type of any size can be safely represented as slice of uninitialized bytes, this method is safe to use.
@@ -79,6 +80,7 @@ pub const fn uninit_byte_slice_from<T>(val: &T) -> &[mem::MaybeUninit<u8>] {
     }
 }
 
+#[inline]
 ///Gets mutable uninit byte slice out of the type.
 ///
 ///It is up to user to interpret result correctly and safe.
@@ -92,18 +94,6 @@ pub const fn uninit_byte_slice_from<T>(val: &T) -> &[mem::MaybeUninit<u8>] {
 ///    uninit_byte_slice_mut_from(&mut 0u32)
 ///};
 ///```
-///
-///## Restrictions
-///
-///Compilation fails for invalid type.
-///
-///```compile_fail
-///use lazy_bytes_cast::uninit_byte_slice_mut_from;
-///
-///let bytes = unsafe {
-///    uninit_byte_slice_mut_from(&mut ())
-///};
-///```
 pub unsafe fn uninit_byte_slice_mut_from<T>(val: &mut T) -> &mut [mem::MaybeUninit<u8>] {
     let _ = Validator::<T, &[u8]>::IS_NOT_ZST;
     unsafe {
@@ -111,6 +101,7 @@ pub unsafe fn uninit_byte_slice_mut_from<T>(val: &mut T) -> &mut [mem::MaybeUnin
     }
 }
 
+#[inline]
 ///Gets byte slice out of the type.
 ///
 ///Available only for types that marked as `Pod`.
@@ -139,6 +130,7 @@ pub const fn byte_slice_from<T: Pod>(val: &T) -> &[u8] {
     }
 }
 
+#[inline]
 ///Gets mutable byte slice out of the type.
 ///
 ///Available only for types that marked as `Pod`.
@@ -167,6 +159,7 @@ pub fn byte_slice_mut_from<T: Pod>(val: &mut T) -> &mut [u8] {
     }
 }
 
+#[inline]
 ///Reads `N` bytes from `Pod` object by performing `memcpy`
 ///
 ///## Usage
@@ -198,6 +191,7 @@ pub const fn to_bytes<T: Pod, const N: usize>(val: &T) -> [u8; N] {
     }
 }
 
+#[inline]
 ///Reads `N` bytes from `Pod` object by performing `memcpy`
 ///
 ///## Usage
