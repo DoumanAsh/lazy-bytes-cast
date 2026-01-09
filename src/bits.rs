@@ -63,6 +63,7 @@ macro_rules! impl_bits {
                 self.0.wrapping_shr(idx) & 1 != 0
             }
 
+            #[must_use]
             #[inline(always)]
             ///Set bit by index and return updated value.
             pub const fn set(self, idx: u32) -> Self {
@@ -71,12 +72,14 @@ macro_rules! impl_bits {
                 Self(self.0 | ONE.wrapping_shl(idx))
             }
 
+            #[must_use]
             #[inline(always)]
             ///Unset bit by index and return updated value.
             pub const fn unset(self, idx: u32) -> Self {
                 Self(self.0 & !(1 << idx))
             }
 
+            #[must_use]
             #[inline(always)]
             ///Unset bit by index and return updated value.
             pub const fn toggle(self, idx: u32) -> Self {
@@ -95,6 +98,7 @@ macro_rules! impl_bits {
                 Self(0)
             }
 
+            #[must_use]
             #[inline(always)]
             ///Flip all bits and returns updated value
             pub const fn flip(&self) -> Self {

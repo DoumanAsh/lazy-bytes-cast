@@ -5,3 +5,5 @@
 [![Docs.rs](https://docs.rs/lazy-bytes-cast/badge.svg)](https://docs.rs/crate/lazy-bytes-cast/)
 
 Simple lazy way to treat stuff like bytes
+
+MSRV 1.64

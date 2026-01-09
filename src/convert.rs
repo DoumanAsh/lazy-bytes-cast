@@ -11,7 +11,7 @@ unsafe fn transmute_slice_mut<IN, OUT>(val: &mut IN) -> &mut [OUT] {
 }
 
 const unsafe fn transmute_ref<IN, OUT: Copy>(val: &IN) -> OUT {
-    *(mem::transmute::<_, &mem::MaybeUninit<OUT>>(val).assume_init_ref())
+    *(mem::transmute::<&IN, &mem::MaybeUninit<OUT>>(val).assume_init_ref())
 }
 
 ///Marker indicating that it is plain old data.

@@ -1,7 +1,7 @@
 //!Lazy utilities to work with bits and bytes.
 
 #![warn(missing_docs)]
-#![cfg_attr(feature = "cargo-clippy", allow(clippy::style))]
+#![allow(clippy::style)]
 #![no_std]
 
 mod bits;
